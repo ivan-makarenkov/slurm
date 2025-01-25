@@ -8,6 +8,13 @@ func main() {
 }
 
 func doubleDetector(nums []int) bool {
-	// TODO: код писать здесь
+	var values = make(map[int]int)
+	for _, num := range nums {
+		values[num]++
+		if values[num] > 1 {
+			return true
+		}
+	}
+
 	return false
 }

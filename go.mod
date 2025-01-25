@@ -1,6 +1,6 @@
 module gotemplate
 
-go 1.23
+go 1.23.0
 
 require (
 	github.com/docker/docker v20.10.16+incompatible

@@ -1,10 +1,21 @@
 package main
 
+import "fmt"
+
 func main() {
-	// Тут демонстрация работы функции
+	fmt.Println(isSorted([]string{"a", "ab", "b", "bc", "c", "cd"}))
 }
 
 func isSorted(ww []string) bool {
-	// TODO: код писать здесь
+	if ww == nil {
+		return false
+	}
+	var lw string
+	for _, w := range ww {
+		if lw > w {
+			return false
+		}
+		lw = w
+	}
 	return true
 }

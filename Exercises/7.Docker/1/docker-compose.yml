@@ -1,0 +1,8 @@
+version: '3'
+services:
+  nginx:
+    container_name: nginx
+    image: nginx@sha256:2d194184b067db3598771b4cf326cfe6ad5051937ba1132b8b7d4b0184e0d0a6
+  redis:
+    container_name: redis
+    image: redis@sha256:121bac949fb5f623b9fa0b4e4c9fb358ffd045966e754cfa3eb9963f3af2fe3b

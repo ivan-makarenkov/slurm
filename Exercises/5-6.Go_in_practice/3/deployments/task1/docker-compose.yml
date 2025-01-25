@@ -1,0 +1,96 @@
+version: '3'
+
+services:
+  rabbitmq:
+    image: 'rabbitmq:3-management-alpine'
+    ports:
+      # The standard AMQP protocol port
+      - '5672:5672'
+      # HTTP management UI
+      - '15672:15672'
+    networks:
+      - messagetask1
+
+  redis:
+    image: redis:7.2
+    ports:
+      - 6379:6379
+    networks:
+      - messagetask1
+  
+  api1:
+    build:
+      context: ../../../../../
+      dockerfile: Exercises/5-6.Go_in_practice/3/build/Dockerfile
+    command: ["./wait.sh", "rabbitmq:5672", "--", "/api", "-r=redis:6379"]
+    working_dir: /
+    ports:
+      - 8080
+    environment:
+      - RABBIT_SERVER_URL=amqp://guest:guest@rabbitmq:5672/
+    depends_on:
+      - rabbitmq
+      - redis
+    networks:
+      - messagetask1
+  api2:
+    build:
+      context: ../../../../../
+      dockerfile: Exercises/5-6.Go_in_practice/3/build/Dockerfile
+    command: ["./wait.sh", "rabbitmq:5672", "--", "/api", "-r=redis:6379"]
+    working_dir: /
+    ports:
+      - 8080
+    environment:
+      - RABBIT_SERVER_URL=amqp://guest:guest@rabbitmq:5672/
+    depends_on:
+      - rabbitmq
+      - redis
+    networks:
+      - messagetask1
+  api3:
+    build:
+      context: ../../../../../
+      dockerfile: Exercises/5-6.Go_in_practice/3/build/Dockerfile
+    command: ["./wait.sh", "rabbitmq:5672", "--", "/api", "-r=redis:6379"]
+    working_dir: /
+    ports:
+      - 8080
+    environment:
+      - RABBIT_SERVER_URL=amqp://guest:guest@rabbitmq:5672/
+    depends_on:
+      - rabbitmq
+      - redis
+    networks:
+      - messagetask1
+  process1:
+    build:
+      context: ../../../../../
+      dockerfile: Exercises/5-6.Go_in_practice/3/build/Dockerfile
+    command: ["./wait.sh", "rabbitmq:5672", "--", "/process", "-r=redis:6379"]
+    working_dir: /
+    environment:
+      - RABBIT_SERVER_URL=amqp://guest:guest@rabbitmq:5672/
+    depends_on:
+      - rabbitmq
+      - redis
+      - proxy
+    networks:
+      - messagetask1
+  proxy:
+    image: nginx
+    volumes:
+      - type: bind
+        source: ./proxy/nginx.conf
+        target: /etc/nginx/nginx.conf
+        read_only: true
+    ports:
+      - 8080:8080
+    depends_on:
+      - api1
+      - api2
+      - api3
+    networks:
+      - messagetask1
+
+networks: {messagetask1: {}}

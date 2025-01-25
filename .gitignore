@@ -1,0 +1,4 @@
+.DS_Store
+Exercises/5-6.Go_in_practice/3/bin/gocdk-pubsub*
+.vscode/*
+.idea/*

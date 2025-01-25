@@ -1,0 +1,97 @@
+openapi: 3.0.3
+info:
+  title: API service-monitor
+  description: Предназначен для команд разработчиков, которым требуется настроить клиентский сервис(ы) работы с service-monitor-ом
+  version: 1.0.0
+paths:
+  /api/v1/metrics:
+    get:
+      operationId: apiMetricList
+      summary: Вывести список метрик
+      description: >
+        Для получения метрик за определенный период времени,
+        соответствующих названию метрики
+      parameters:
+        - name: serviceId
+          in: query
+          schema:
+            type: string
+            description: Идентификатор сервиса, по которому ищем метрики
+            default: "*"
+        - name: name
+          in: query
+          schema:
+            type: string
+            description: Имя метрики, которую ищем
+            default: "*"
+        - name: date_from
+          in: query
+          schema:
+            type: string
+            format: date-time
+            description: Дата-время начиная с которой необходимо получить метрики
+        - name: date_to
+          in: query
+          schema:
+            type: string
+            format: date-time
+            description: Дата-время по которую необходимо получить метрики
+      responses:
+        '200':
+          description: Возвращает список метрик отсортированных в хронологическом порядке
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Metrics'
+        default:
+          description: Нештатное поведение, какая-то ошибка, важен HTTP код ответа
+          content:
+            application/json:
+                schema:
+                  $ref: '#/components/schemas/DefaultResponse'
+components:
+  schemas:
+    DefaultResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          minimum: 100
+          maximum: 599
+        message:
+          type: string
+          minLength: 1
+        error:
+          type: string
+          minLength: 1
+    Metric:
+      type: object
+      properties:
+        id:
+          type: integer
+          minimum: 1
+          description: Идентификатор записи о метрике в базе данных
+        serviceId:
+          type: string
+          description: Идентификатор сервиса для которого получена метрика
+        timestamp:
+          type: string
+          format: date-time
+        name:
+          type: string
+          minLength: 1
+          description: Имя метрики
+        value:
+          type: number
+          format: float
+          description: Значение метрики
+      required:
+      - id
+      - serviceId
+      - timestamp
+      - name
+      - value
+    Metrics:
+      type: array
+      items:
+        $ref: '#/components/schemas/Metric'

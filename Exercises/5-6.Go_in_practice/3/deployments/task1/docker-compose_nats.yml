@@ -1,0 +1,95 @@
+version: '3'
+
+services:
+  nats:
+    image: bitnami/nats:2.10.12
+    ports:
+      - 4222:4222
+      - 6222:6222
+      - 8222:8222
+    networks:
+      - messagetask1
+
+  redis:
+    image: redis:7.2
+    ports:
+      - 6379:6379
+    networks:
+      - messagetask1
+  
+  api1:
+    build:
+      context: ../../../../../
+      dockerfile: Exercises/5-6.Go_in_practice/3/build/Dockerfile
+    command: ["./natswait.sh", "nats:4222", "--", "/api", "-r=redis:6379", "-t=nats://rates"]
+    working_dir: /
+    ports:
+      - 8080
+    environment:
+      - NATS_SERVER_URL=nats://nats:4222
+    depends_on:
+      - nats
+      - redis
+    networks:
+      - messagetask1
+  api2:
+    build:
+      context: ../../../../../
+      dockerfile: Exercises/5-6.Go_in_practice/3/build/Dockerfile
+    command: ["./natswait.sh", "nats:4222", "--", "/api", "-r=redis:6379", "-t=nats://rates"]
+    working_dir: /
+    ports:
+      - 8080
+    environment:
+      - NATS_SERVER_URL=nats://nats:4222
+    depends_on:
+      - nats
+      - redis
+    networks:
+      - messagetask1
+  api3:
+    build:
+      context: ../../../../../
+      dockerfile: Exercises/5-6.Go_in_practice/3/build/Dockerfile
+    command: ["./natswait.sh", "nats:4222", "--", "/api", "-r=redis:6379", "-t=nats://rates"]
+    working_dir: /
+    ports:
+      - 8080
+    environment:
+      - NATS_SERVER_URL=nats://nats:4222
+    depends_on:
+      - nats
+      - redis
+    networks:
+      - messagetask1
+  process1:
+    build:
+      context: ../../../../../
+      dockerfile: Exercises/5-6.Go_in_practice/3/build/Dockerfile
+    command: ["./natswait.sh", "nats:4222", "--", "/process", "-r=redis:6379", "-t=nats://rates?queue=processors"]
+    working_dir: /
+    environment:
+      - NATS_SERVER_URL=nats://nats:4222
+    depends_on:
+      - nats
+      - redis
+      - proxy
+    networks:
+      - messagetask1
+  proxy:
+    image: nginx
+    volumes:
+      - type: bind
+        source: ./proxy/nginx.conf
+        target: /etc/nginx/nginx.conf
+        read_only: true
+    ports:
+      - 8080:8080
+    depends_on:
+      - api1
+      - api2
+      - api3
+    networks:
+      - messagetask1
+
+networks: {messagetask1: {}}
